@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: xgdl
+Version: 0.0.2
+Summary: My first Python package
+Author: Jiajun Zhu
+Author-email: <zhuconv@gmail.com>
+Keywords: geometric deep learning,explainable AI,graph neural network,AI for science
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Education
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+
+My first Python package with a slightly longer description

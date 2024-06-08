@@ -1,0 +1,165 @@
+data:
+  data_name: synmol
+  data_dir: /usr/scratch/jzhu617/data
+  feature_type: only_x # only_pos or only_x or both_x_pos or only_ones
+
+logging:
+  tensorboard: false
+  topk: [5, 8, 10]
+
+optimizer:
+  batch_size: 128
+  wp_lr: 1.0e-3
+  wp_wd: 1.0e-5
+  attn_lr: 1.0e-3
+  attn_wd: 1.0e-5
+  emb_lr: 1.0e-3
+  emb_wd: 1.0e-5
+
+dgcnn:
+  n_layers: 4
+  hidden_size: 64
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+  pool: add
+
+erm:
+  warmup: 300
+  epochs: 0
+
+asap:
+  warmup: 0
+  epochs: 100
+  casual_ratio: 0.5
+  dropout_p: 0.2
+  return_attn: fitness # fitness
+
+lri_bern:
+  #! epochs should be 100 if it has been changed
+  epochs: 100
+  warmup: 0
+  final_r: 0.7
+  info_loss_coef: 0.1
+
+  # not tuned
+  one_encoder: true
+  attn_constraint: none
+  temperature: 1.0
+  decay_interval: 10
+  decay_r: 0.1
+  init_r: 0.9
+  pred_loss_coef: 1.0
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+lri_gaussian:
+  epochs: 50
+  #! warmup should be 50 if it has been changed
+  warmup: 50
+  pos_coef: 15
+  info_loss_coef: 0.01
+
+  # not tuned
+  kr: 5
+  one_encoder: true
+  attn_constraint: none
+  covar_dim: 3
+  pred_loss_coef: 1.0
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+vgib:
+  epochs: 50
+  #! original warmup: 50
+  warmup: 50
+  mi_loss_coef: 0.0001
+  reg_loss_coef: 0.1
+  noise_loss_coef: 10
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+test:
+  warmup: 0
+  epochs: 300
+
+ciga:
+  warmup: 0
+  epochs: 150
+  contrast_loss_coef: 0.1
+  hinge_loss_coef: 0.1
+  causal_ratio: 0.6
+
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+dir:
+  warmup: 50
+  epochs: 100
+  causal_loss_coef: 1
+  conf_loss_coef: 1
+  reg_loss_coef: 0.01
+  causal_ratio: 0.7
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+gnnlrp:
+  epochs: 1
+
+inter_grad:
+  epochs: 1
+  signal_class: 1
+
+gradcam:
+  epochs: 1
+  signal_class: 1
+
+gradx:
+  epochs: 1
+  signal_class: 1
+
+subgraphx:
+  epochs: 1
+  sparsity_set: [0.3, 0.4, 0.5, 0.6, 0.7]
+  score_threshold: 0.3
+  high2low: false
+  subgraph_building_method: "split"
+  use_mcts: false
+  use_pruning: true
+
+pgmexplainer:
+  epochs: 1
+  pred_threshold: null
+  perturb_mode: split
+  percentage: 20
+
+pgexplainer:
+  size_loss_coef: 0.1
+  mask_ent_loss_coef: 0.1
+
+  epochs: 30
+  warmup: 300
+  temp: [1.0, 1.0]
+  pred_loss_coef: 1.0
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+gnnexplainer:
+  size_loss_coef: 0.01
+  mask_ent_loss_coef: 0.1
+  iter_lr: 1.0e-1
+
+  epochs: 1
+  warmup: 300
+  iter_per_sample: 500
+  pred_loss_coef: 1.0
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+

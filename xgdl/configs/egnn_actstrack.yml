@@ -1,0 +1,179 @@
+data:
+  data_name: actstrack
+  data_dir: /usr/scratch/jzhu617/data
+  split:
+    train: 0.7
+    valid: 0.15
+    test: 0.15
+  im_thres: 2
+  sample_tracks: 10
+  pos_features:
+    - tx
+    - ty
+    - tz
+  other_features:
+    - tt
+    - tpx
+    - tpy
+    - tpz
+    - te
+    - deltapx
+    - deltapy
+    - deltapz
+    - deltae
+  feature_type: only_ones # only_pos or only_x or both_x_pos or only_ones
+
+logging:
+  tensorboard: false
+  topk: [12, 24, 30]
+
+optimizer:
+  batch_size: 64
+  wp_lr: 1.0e-3
+  wp_wd: 1.0e-5
+  attn_lr: 1.0e-3
+  attn_wd: 1.0e-5
+  emb_lr: 1.0e-3
+  emb_wd: 1.0e-5
+
+egnn:
+  n_layers: 4
+  hidden_size: 64
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+  pool: add
+
+erm:
+  warmup: 300
+  epochs: 0
+
+asap:
+  warmup: 0
+  epochs: 300
+  casual_ratio: 0.5
+  dropout_p: 0.2
+  return_attn: fitness # fitness / score
+
+lri_bern:
+  epochs: 300
+  warmup: 0
+  final_r: 0.7
+  info_loss_coef: 0.1
+
+  # not tuned
+  one_encoder: true
+  attn_constraint: none
+  temperature: 1.0
+  decay_interval: 10
+  decay_r: 0.1
+  init_r: 0.9
+  pred_loss_coef: 1.0
+  pred_lr: 1.0e-3
+  pred_wd: 1.0e-5
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+lri_gaussian:
+  epochs: 100
+  #! warmup should be 200 if was changed
+  warmup: 200
+  pos_coef: 300.0
+  info_loss_coef: 0.01
+
+  # not tuned
+  kr: 10
+  one_encoder: true
+  attn_constraint: none
+  covar_dim: 3
+  pred_loss_coef: 1.0
+  pred_lr: 1.0e-3
+  pred_wd: 1.0e-5
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+ciga:
+  warmup: 0
+  epochs: 300
+  contrast_loss_coef: 1
+  hinge_loss_coef: 0.01
+  causal_ratio: 0.6
+  pred_lr: 1.0e-3
+  pred_wd: 1.0e-5
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+vgib:
+  epochs: 200
+  warmup: 100
+  mi_loss_coef: 0.001
+  reg_loss_coef: 0.1
+  noise_loss_coef: 10
+  pred_lr: 1.0e-3
+  pred_wd: 1.0e-5
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+gnnlrp:
+  epochs: 1
+
+inter_grad:
+  epochs: 1
+  signal_class: 1
+
+gradcam:
+  epochs: 1
+  signal_class: 1
+
+gradx:
+  epochs: 1
+  signal_class: 1
+
+subgraphx:
+  epochs: 1
+  sparsity_set: [0.3, 0.4, 0.5, 0.6, 0.7]
+  score_threshold: 0.1
+  high2low: false
+  subgraph_building_method: "split"
+  use_mcts: false
+  use_pruning: true
+
+pgmexplainer:
+  epochs: 1
+  pred_threshold: 0.3
+  perturb_mode: split
+  percentage: 20
+
+pgexplainer:
+  size_loss_coef: 0.01
+  mask_ent_loss_coef: 0.1
+
+  epochs: 100
+  warmup: 300
+  temp: [1.0, 1.0]
+  pred_loss_coef: 1.0
+  pred_lr: 0
+  pred_wd: 0
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
+gnnexplainer:
+  size_loss_coef: 0.01
+  mask_ent_loss_coef: 0.1
+  iter_lr: 1.0e-1
+
+  epochs: 1
+  warmup: 300
+  iter_per_sample: 500
+  pred_loss_coef: 1.0
+  pred_lr: 0
+  pred_wd: 0
+  dropout_p: 0.2
+  norm_type: batch
+  act_type: relu
+
