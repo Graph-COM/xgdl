@@ -1,5 +1,5 @@
-# EXplainability for Geometric Deep Learning (XGDL)
-GDL Interpretability Library for Scientific Tasks
+# XGDL
+XGDL (eXplainability for Geometric Deep Learning) is an explainability library for scientific tasks using geometric deep learning.
 ______________________________________________________________________
 ## Quick Tour
 ```python
