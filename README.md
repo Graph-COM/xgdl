@@ -1,6 +1,6 @@
-# xgdl
+# EXplainability for Geometric Deep Learning (XGDL)
 GDL Interpretability Library for Scientific Tasks
-
+______________________________________________________________________
 ## Quick Tour
 ```python
 from typing import Any
