@@ -2,7 +2,7 @@
 XGDL (eXplainability for Geometric Deep Learning) is an explainability library for scientific tasks using geometric deep learning.
 ______________________________________________________________________
 ## Features
-- The implementation of 13 methods including self-interpretable (inherent) and posthoc methods
+- The implementation of 13 methods including self-interpretable (inherent) and post-hoc methods
 - The evaluation pipeline for both sensitive and deicisve patterns (see our paper for more details)
 - The dataloader module for scientific datasets.
 
