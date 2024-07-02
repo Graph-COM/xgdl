@@ -15,13 +15,13 @@ from torch_geometric.data import InMemoryDataset, Data
 import rdkit.Chem as Chem
 import rdkit.Chem.AllChem as AllChem
 
-from utils import download_url, extract_zip, decide_download
+from ..utils import download_url, extract_zip, decide_download
 
 
 class SynMol(InMemoryDataset):
     ATOM_TYPES = ['C', 'N', 'O', 'S', 'F', 'P', 'Cl', 'Br', 'Na', 'Ca', 'I', 'B', 'H', '*']
 
-    def __init__(self, root, data_config, seed, transform, device):
+    def __init__(self, root, data_config, transform, device='cpu', seed=0):
         self.url_raw = 'https://zenodo.org/record/7265547/files/synmol_raw.zip'
         self.url_processed = 'https://zenodo.org/record/7265547/files/synmol_processed.zip'
         self.seed = seed

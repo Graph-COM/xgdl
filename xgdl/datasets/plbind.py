@@ -30,8 +30,8 @@ from rdkit.Chem.rdPartialCharges import ComputeGasteigerCharges
 from Bio.PDB import PDBParser
 from Bio.PDB.PDBExceptions import PDBConstructionWarning
 
-from utils import pmap_multi, disable_rdkit_logging, safe_index, log, allowable_features, sr
-from utils import download_url, extract_zip, decide_download
+from ..utils import pmap_multi, disable_rdkit_logging, safe_index, log, allowable_features, sr
+from ..utils import download_url, extract_zip, decide_download
 
 
 biopython_parser = PDBParser()
@@ -44,7 +44,7 @@ def binary_affinity(affinity, thres=100):
     return (aff_nM < thres).float()
 
 
-class GenContact(BaseTransform):
+class  GenContact(BaseTransform):
     def __init__(self, data_config):
         self.bin_thres = data_config['bin_thres']
 
@@ -61,8 +61,7 @@ class GenContact(BaseTransform):
 
 
 class PLBind(InMemoryDataset):
-
-    def __init__(self, root, data_config, device, n_jobs=32, debug=False):
+    def __init__(self, root, data_config, transform, n_jobs=32, debug=False, device='cpu'):
         self.url_raw = 'https://zenodo.org/record/7265547/files/plbind_raw.zip'
         self.url_processed = 'https://zenodo.org/record/7265547/files/plbind_processed.zip'
         self.data_dir = root
@@ -71,8 +70,11 @@ class PLBind(InMemoryDataset):
         self.bin_thres = data_config['bin_thres']
         self.n_jobs = n_jobs
         self.debug = debug
-
-        super().__init__(root, transform=GenContact(data_config))
+        from functools import reduce
+        def chain_functions(*funcs):
+            return lambda x: reduce(lambda v, func: func(v), funcs, x)
+        transform = chain_functions(GenContact(data_config), transform)
+        super().__init__(root, transform=transform)
         self.data, self.slices, self.idx_split = torch.load(self.processed_paths[0])
         self.data = self.data.to(device)
         self.complex_names = pickle.load(open(os.path.join(self.processed_dir, 'raw_data.pkl'), 'rb'))[-1]
@@ -116,6 +118,7 @@ class PLBind(InMemoryDataset):
         self.n_scalar_feat_to_use_lig = data_config['n_scalar_feat_to_use_lig']
         self.n_categorical_feat_to_use = data_config['n_categorical_feat_to_use']
         self.n_scalar_feat_to_use = data_config['n_scalar_feat_to_use']
+        self.use_lig_info = data_config['use_lig_info']
 
     @property
     def raw_file_names(self):

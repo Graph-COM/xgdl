@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 import torch.nn.functional as F
 from torch_scatter import scatter, scatter_max
-from backbones import GINConv
+from ...backbones import GINConv
 # from evaluation import control_sparsity
 from ..base import BaseRandom
 

@@ -1,5 +1,5 @@
-# XGDL
-XGDL (eXplainability for Geometric Deep Learning) is an explainability library for scientific tasks using geometric deep learning.
+# XGDL 
+XGDL (eXplainability for Geometric Deep Learning) is an explainability library for scientific tasks using geometric deep learning. (The interface is in a state of ongoing enhancement.)
 ______________________________________________________________________
 ## Features
 - The implementation of 13 methods including self-interpretable (inherent) and post-hoc methods
@@ -10,14 +10,14 @@ ______________________________________________________________________
 
 ### Load Dataset
 ```python
-from xgdl import HEPDataset, BioDataset
+from xgdl import ScienceDataset    
 
-dataset = HEPDataset()
+dataset = ScienceDataset.from_name('synmol')
 sample = dataset[0]
 print(sample)
 ```
 
-> The output: " "
+> Output: Data(x=[18, 1], y=[1, 1], pos=[18, 3], node_label=[18], mol_df_idx=[1], edge_index=[2, 90])
 
 ### Use Self-interpretatble Model
 ```python
@@ -46,7 +46,7 @@ inherent_explainer.train(dataset)
 inherent_explainer.explain(sample)
 
 #! in explain() we need model.get_emb(data), model.get_pred_from_emb(emb) and self.extractor(emb)
-interpretation = inherent_explainer.explain(data)
+interpretation = inherent_explainer.explain(sample)
 ```
 ### Use Post-hoc Method
 ```python
@@ -75,7 +75,7 @@ def pretrained_model_init(model):
     #! or do nothing
     return model
 
-posthoc_explainer = PosthocExplainer(config, model=model, pretrained_model_init=pretrained_model_init)
+posthoc_explainer = PosthocMethod(config, pretrained_model_init=pretrained_model_init)
 
 # for some post_hoc method, directly use explain
 posthoc_explainer.explain(sample)

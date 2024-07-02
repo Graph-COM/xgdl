@@ -11,7 +11,7 @@ import torch.nn.functional as F
 from torch_geometric.nn.inits import reset
 from torch_geometric.nn.conv import MessagePassing
 
-from utils import FeatEncoder, MLP
+from ..utils import FeatEncoder, MLP
 
 
 class DGCNN(torch.nn.Module):

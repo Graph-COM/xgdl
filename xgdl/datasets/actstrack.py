@@ -13,12 +13,12 @@ import numpy as np
 import torch
 from torch_geometric.data import Data, InMemoryDataset
 
-from utils import get_random_idx_split, download_url, extract_zip, decide_download
+from ..utils import get_random_idx_split, download_url, extract_zip, decide_download
 
 
 class ActsTrack(InMemoryDataset):
 
-    def __init__(self, root, tesla, data_config, seed, transform, device):
+    def __init__(self, root, tesla, data_config, transform, device='cpu', seed=0):
         self.url_raw = 'https://zenodo.org/record/7265547/files/actstrack_raw_2T.zip'
         self.url_processed = 'https://zenodo.org/record/7265547/files/actstrack_processed_2T.zip'
         self.tesla = tesla

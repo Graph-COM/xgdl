@@ -18,12 +18,15 @@ class BaseRandom(nn.Module):
         pred_loss = self.criterion(clf_logits, data.y.float())
         return pred_loss, {'loss': pred_loss.item(), 'pred': pred_loss.item()}, clf_logits, None
         
-
-    def forward(self, data):
+    def train(self, dataset):
+        pass
+    
+    def predict(self, data):
         original_clf_logits = self.clf(data)
         return original_clf_logits
 
     def forward_pass(self, data, epoch, do_sampling):
+        raise NotImplementedError("Please use the implementation of specific interpretation method")
         node_labels = data.node_label
         emb, edge_index = self.clf.get_emb(data)
 

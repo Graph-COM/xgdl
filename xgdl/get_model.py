@@ -1,16 +1,118 @@
 import torch
 import torch.nn as nn
+from torch.nn import functional as F
 from torch_geometric.nn import knn_graph, radius_graph
 from torch_geometric.nn import global_mean_pool, global_add_pool, global_max_pool
+from .baselines import *
+from .backbones import DGCNN, PointTransformer, EGNN
+from .utils import ExtractorMLP, MLP, CoorsNorm
+from pathlib import Path
+import yaml
+from .utils import inherent_models, post_hoc_explainers, post_hoc_attribution
+from .get_data import get_loaders
 
-from backbones import DGCNN, PointTransformer, EGNN
-from utils import ExtractorMLP, MLP, CoorsNorm
+POST_ATTRIBUTOR_MAPPING = {
+    'gradcam': GradCAM,
+    'gradx': GradX,
+    'gnnlrp': GNNLRP,
+    'ig': InterGrad,
+    'subgraphx': SubgraphX,
+    'pgmexplainer': PGMExplainer,
+}
 
+POSTHOC_PARAMETRIZED_MODEL_MAPPING = {
+    'gnnexplainer': GNNExplainer,
+    'pgexplainer': PGExplainer,
+}
+
+INHERENT_MODEL_MAPPING = {
+    'lri_bern': LRIBern,
+    'lri_gaussian': LRIGaussian,
+    'asap': ASAP,
+    'vgib': VGIB,
+    'ciga': CIGA,
+}
+
+class _XBaseModel:
+    # Base class for auto models.
+    _model_mapping = None
+
+    def __init__(self, *args, **kwargs):
+        raise EnvironmentError(
+            f"{self.__class__.__name__} is designed to be instantiated "
+            f"using the `{self.__class__.__name__}.from_name(method_name)` or "
+            f"`{self.__class__.__name__}.from_config(config)` methods."
+        )
+
+    @classmethod
+    def _prepare_clf_extractor(cls, dataset, config):
+        model_name = config['model']
+        method_name = config['method']
+        method_config = config['hyperparameter']
+        cfg_path = Path(__file__).parent / 'configs' / f'{dataset.dataset_name}.yml'
+        model_config = yaml.safe_load((cfg_path).open('r'))['model'][f'{model_name}']
+        
+        clf = Model(model_name, model_config, method_name, method_config, dataset)
+        if method_name == 'asap':
+            extractor = ASAPooling(model_config['hidden_size'], ratio=method_config['casual_ratio'], dropout=model_config['dropout_p'])
+        elif method_name in inherent_models + ['pgexplainer']:
+            extractor =  ExtractorMLP(model_config['hidden_size'], model_config, getattr(dataset, "use_lig_info", False))
+        else:
+            extractor = nn.Identity()
+
+        return clf, extractor
+
+    @classmethod
+    def from_config(cls, config, dataset_info):
+        criterion = F.binary_cross_entropy_with_logits
+        clf, extractor = cls._prepare_clf_extractor(dataset_info, config)
+
+        name = config['method']
+        method_config = config['hyperparameter']
+
+        model_class = cls._model_mapping[name]
+        model = model_class(clf, extractor, criterion, method_config)
+        return model
+
+    def predict(sample):
+        pass
+
+class PosthocAttributor(_XBaseModel):
+    _model_mapping = POST_ATTRIBUTOR_MAPPING
+    def explain(sample):
+        pass
+
+class PosthocParametrizedModel(_XBaseModel):
+    _model_mapping = POSTHOC_PARAMETRIZED_MODEL_MAPPING
+    def train(dataset, **kwargs):
+        pass
+    def explain(sample):
+        pass
+
+class PosthocMethod(_XBaseModel):
+    # _model_mapping = POSTHOC_PARAMETRIZED_MODEL_MAPPING | POST_ATTRIBUTOR_MAPPING
+    _model_mapping = {**POSTHOC_PARAMETRIZED_MODEL_MAPPING, **POST_ATTRIBUTOR_MAPPING}  
+    def train(dataset):
+        pass
+    def explain(sample):
+        pass
+
+class InherentModel(_XBaseModel):
+    _model_mapping = INHERENT_MODEL_MAPPING
+    def train(dataset, **kwargs):
+        dataloader = get_loaders(dataset, **kwargs)
+        train_loader = dataloader['train']
+        valid_loader = dataloader['valid']
+        # for 
+
+    def explain(sample):
+        pass
 
 
 class Model(nn.Module):
     def __init__(self, model_name, model_config, method_name, method_config, dataset):
         super().__init__()
+        
         assert dataset.dataset_name in ['tau3mu', 'plbind', 'synmol'] or 'actstrack' in dataset.dataset_name
         # self.dataset = dataset
         self.dataset_name = dataset.dataset_name
