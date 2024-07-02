@@ -9,7 +9,7 @@ from .utils import ExtractorMLP, MLP, CoorsNorm
 from pathlib import Path
 import yaml
 from .utils import inherent_models, post_hoc_explainers, post_hoc_attribution
-from .get_data import get_loaders
+from .get_data import get_loaders, ScienceDataset
 
 POST_ATTRIBUTOR_MAPPING = {
     'gradcam': GradCAM,
@@ -63,7 +63,8 @@ class _XBaseModel:
         return clf, extractor
 
     @classmethod
-    def from_config(cls, config, dataset_info):
+    def from_config(cls, config):
+        dataset_info = ScienceDataset.from_name(config['dataset'])
         criterion = F.binary_cross_entropy_with_logits
         clf, extractor = cls._prepare_clf_extractor(dataset_info, config)
 

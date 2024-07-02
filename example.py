@@ -8,8 +8,8 @@ from xgdl import InherentModel
 
 config = {
     'method': "lri_bern",
-    'model': "egnn", # choose from []
-    "dataset": "tau3mu",
+    'model': "egnn", # choose from ['egnn', 'dgcnn', 'pointtrans']
+    "dataset": "synmol", # choose from ['synmol', 'tau3mu', 'actstrack', 'plbind']
     "hyperparameter":
         {
         'pred_loss_coef': 0.1,
@@ -23,7 +23,7 @@ config = {
         }
     }
 
-inherent_explainer = InherentModel.from_config(config, dataset_info=dataset)
+inherent_explainer = InherentModel.from_config(config)
 print(inherent_explainer)
 # for inherent method, use train and then explain
 inherent_explainer.train(dataset)
@@ -36,19 +36,20 @@ interpretation = inherent_explainer.explain(sample)
 from xgdl import PosthocMethod
 
 config = {
-    'name': "gradcam",
-    'clf': 1,
-    'extractor': 1,
-    'criterion': 1,
-
-    'pred_loss_coef': 0.1,
-    'info_loss_coef': 0.05,
-    'temperature': 1.0,
-    'final_r': 0.9,
-    'decay_interval': 10,
-    'decay_r': 0.01,
-    'init_r': 0.5,
-    'attn_constraint': True
+    'method': "gradcam",
+    'model': "egnn", # choose from ['egnn', 'dgcnn', 'pointtrans']
+    "dataset": "synmol", # choose from ['synmol', 'tau3mu', 'actstrack', 'plbind']
+    "hyperparameter":
+    {
+        'pred_loss_coef': 0.1,
+        'info_loss_coef': 0.05,
+        'temperature': 1.0,
+        'final_r': 0.9,
+        'decay_interval': 10,
+        'decay_r': 0.01,
+        'init_r': 0.5,
+        'attn_constraint': True
+    }
 }
 
 # for post-hoc method, we need func pretrained_model_init

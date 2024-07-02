@@ -10,6 +10,8 @@ from torch_geometric.nn import knn_graph, radius_graph
 DATASET_CANDIS = ['tau3mu', 'plbind', 'synmol', 'actstrack']
 
 class ScienceDataset:
+    _initialized_datasets = {}
+
     def __init__(self, *args, **kwargs):
         raise EnvironmentError(
             f"{self.__class__.__name__} is designed to be instantiated "
@@ -17,7 +19,10 @@ class ScienceDataset:
         )
 
     @classmethod
-    def from_name(self, name, config=None) -> None:
+    def from_name(cls, name, config=None) -> None:
+        if name in cls._initialized_datasets:
+            return cls._initialized_datasets[name]
+
         assert name in DATASET_CANDIS, f"Dataset name {name} is not supported, choose from {DATASET_CANDIS}"
         if config is None:
             cfg_path = Path(__file__).parent / 'configs' / f'{name}.yml'
@@ -51,6 +56,8 @@ class ScienceDataset:
                 data.edge_index = edge_index
                 return data
             dataset = PLBind(data_dir / 'plbind', data_config=config, transform=plb_transform, n_jobs=32, debug=False)
+
+        cls._initialized_datasets[name] = dataset
         return dataset
 
     def get_train_loader(self, batch_size):
