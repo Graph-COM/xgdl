@@ -6,8 +6,33 @@ import numpy
 from torch_geometric.loader import DataLoader
 from .datasets import ActsTrack, PLBind, Tau3Mu, SynMol
 from torch_geometric.nn import knn_graph, radius_graph
+from torch.utils.data import Subset
 
 DATASET_CANDIS = ['tau3mu', 'plbind', 'synmol', 'actstrack']
+
+def syn_transform(data):
+    edge_index = knn_graph(data.pos, k=5, batch=data.batch, loop=True)
+    data.edge_index = edge_index
+    return data
+
+def act_transform(data):
+    # pos = data.pos / 2955.5000 * 100
+    norm_pos = data.pos.norm(dim=-1, keepdim=True)
+    pos = data.pos / norm_pos.clamp(min=1e-6)
+    edge_index = knn_graph(pos, k=5, batch=data.batch, loop=True)
+    data.edge_index = edge_index
+    return data
+
+def tau_transform(data):
+    edge_index = radius_graph(data.pos, r=1.0, batch=data.batch, loop=True)
+    data.edge_index = edge_index
+    return data
+
+def plb_transform(data):
+    edge_index = radius_graph(data.pos, r=2.0, batch=data.batch, loop=True)
+    data.edge_index = edge_index
+    return data
+
 
 class ScienceDataset:
     _initialized_datasets = {}
@@ -17,6 +42,12 @@ class ScienceDataset:
             f"{self.__class__.__name__} is designed to be instantiated "
             f"using the `{self.__class__.__name__}.from_name(method_name)`."
         )
+
+    @classmethod
+    def filter_signal_class(cls, dataset, target_label=torch.tensor([[1]])):
+        target_label = target_label.to(dtype=torch.float32)
+        indices = [i for i, data in enumerate(dataset) if torch.equal(data.y, target_label)]
+        return Subset(dataset, indices)
 
     @classmethod
     def from_name(cls, name, config=None) -> None:
@@ -29,32 +60,13 @@ class ScienceDataset:
             config = yaml.safe_load((cfg_path).open('r'))['data']
         data_dir = Path(config['data_dir'])
         if 'actstrack' in name:
-            def act_transform(data):
-                # pos = data.pos / 2955.5000 * 100
-                norm_pos = data.pos.norm(dim=-1, keepdim=True)
-                pos = data.pos / norm_pos.clamp(min=1e-6)
-                edge_index = knn_graph(pos, k=5, batch=data.batch, loop=True)
-                data.edge_index = edge_index
-                return data
             tesla = '2T' if len(name.split('_')) == 1 else name.split('_')[-1]
             dataset = ActsTrack(data_dir / 'actstrack', tesla=tesla, data_config=config, transform=act_transform)
         elif name == 'tau3mu':
-            def tau_transform(data):
-                edge_index = radius_graph(data.pos, r=1.0, batch=data.batch, loop=True)
-                data.edge_index = edge_index
-                return data
             dataset = Tau3Mu(data_dir / 'tau3mu', data_config=config, transform=tau_transform)
         elif name == 'synmol':
-            def syn_transform(data):
-                edge_index = knn_graph(data.pos, k=5, batch=data.batch, loop=True)
-                data.edge_index = edge_index
-                return data
             dataset = SynMol(data_dir / 'synmol', data_config=config, transform=syn_transform)
         elif name == 'plbind':
-            def plb_transform(data):
-                edge_index = radius_graph(data.pos, r=2.0, batch=data.batch, loop=True)
-                data.edge_index = edge_index
-                return data
             dataset = PLBind(data_dir / 'plbind', data_config=config, transform=plb_transform, n_jobs=32, debug=False)
 
         cls._initialized_datasets[name] = dataset
@@ -80,7 +92,7 @@ def get_data_loaders(dataset_name, batch_size, data_config, dataset_seed, num_wo
             return data
         tesla = '2T' if len(dataset_name.split('_')) == 1 else dataset_name.split('_')[-1]
         dataset = ActsTrack(data_dir / 'actstrack', tesla=tesla, data_config=data_config, seed=dataset_seed, transform=act_transform, device=device)
-        loaders, test_set = get_loaders_and_test_set(batch_size, dataset=dataset, idx_split=dataset.idx_split, num_workers=num_workers)
+        loaders, test_set = get_loaders(batch_size, dataset=dataset, idx_split=dataset.idx_split, num_workers=num_workers)
 
     elif dataset_name == 'tau3mu':
         def tau_transform(data):
@@ -88,7 +100,7 @@ def get_data_loaders(dataset_name, batch_size, data_config, dataset_seed, num_wo
             data.edge_index = edge_index
             return data
         dataset = Tau3Mu(data_dir / 'tau3mu', data_config=data_config, seed=dataset_seed, transform=tau_transform, device=device)
-        loaders, test_set = get_loaders_and_test_set(batch_size, dataset=dataset, idx_split=dataset.idx_split, num_workers=num_workers)
+        loaders, test_set = get_loaders(batch_size, dataset=dataset, idx_split=dataset.idx_split, num_workers=num_workers)
 
     elif dataset_name == 'synmol':
         def syn_transform(data):
@@ -96,22 +108,22 @@ def get_data_loaders(dataset_name, batch_size, data_config, dataset_seed, num_wo
             data.edge_index = edge_index
             return data
         dataset = SynMol(data_dir / 'synmol', data_config=data_config, seed=dataset_seed, transform=syn_transform, device=device)
-        loaders, test_set = get_loaders_and_test_set(batch_size, dataset=dataset, idx_split=dataset.idx_split, num_workers=num_workers)
+        loaders, test_set = get_loaders(batch_size, dataset=dataset, idx_split=dataset.idx_split, num_workers=num_workers)
 
     elif dataset_name == 'plbind':
         dataset = PLBind(data_dir / 'plbind', data_config=data_config, device=device, n_jobs=32, debug=False)
-        loaders, test_set = get_loaders_and_test_set(batch_size, dataset=dataset, idx_split=dataset.idx_split, dataset_name=dataset_name, num_workers=num_workers)
+        loaders, test_set = get_loaders(batch_size, dataset=dataset, idx_split=dataset.idx_split, dataset_name=dataset_name, num_workers=num_workers)
 
     return loaders, test_set, dataset
 
+def seed_worker(worker_id):
+    worker_seed = torch.initial_seed() % 2 ** 32
+    numpy.random.seed(worker_seed)
+    random.seed(worker_seed)
 
 def get_loaders(batch_size, dataset, num_workers=8):
-    idx_split = dataset.index_split
+    idx_split = dataset.idx_split
     dataset_name = dataset.dataset_name
-    def seed_worker(worker_id):
-        worker_seed = torch.initial_seed() % 2 ** 32
-        numpy.random.seed(worker_seed)
-        random.seed(worker_seed)
     #
     # def collate_gpu(batch, device='cpu'):
     #     x, t = torch.utils.data.dataloader.default_collate(batch)
@@ -126,5 +138,5 @@ def get_loaders(batch_size, dataset, num_workers=8):
     valid_loader = DataLoader(dataset[idx_split["valid"]], batch_size=batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=seed_worker, follow_batch=follow_batch)
     test_loader = DataLoader(dataset[idx_split["test"]], batch_size=batch_size, shuffle=False, num_workers=num_workers, worker_init_fn=seed_worker, follow_batch=follow_batch)
 
-    test_set = dataset.copy(idx_split["test"])  # For visualization
-    return {'train': train_loader, 'valid': valid_loader, 'test': test_loader}, test_set
+    # test_set = dataset.copy(idx_split["test"])  # For visualization
+    return {'train': train_loader, 'valid': valid_loader, 'test': test_loader}

@@ -10,17 +10,18 @@ from tqdm import tqdm
 from pathlib import Path
 from copy import deepcopy
 from itertools import product
-import nni
+# import nni
 import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-from torch.utils.tensorboard import SummaryWriter
-from eval import FidelEvaluation, AUCEvaluation, PrecEvaluation
-from get_model import Model
-from baselines import *
-from utils import to_cpu, log_epoch, get_data_loaders, set_seed, update_and_save_best_epoch_res, load_checkpoint, save_checkpoint, ExtractorMLP, get_optimizer
-from utils import inherent_models, post_hoc_explainers, post_hoc_attribution, name_mapping
+# from torch.utils.tensorboard import SummaryWriter
+from .eval import FidelEvaluation, AUCEvaluation, PrecEvaluation
+# from .get_model import Model
+from .baselines import *
+from .get_data import get_data_loaders
+from .utils import to_cpu, log_epoch, set_seed, update_and_save_best_epoch_res, load_checkpoint, save_checkpoint, ExtractorMLP, get_optimizer
+from .utils import inherent_models, post_hoc_explainers, post_hoc_attribution, name_mapping
 import torchmetrics
 from statistics import mean
 import warnings
@@ -120,7 +121,8 @@ def run_one_epoch(baseline, optimizer, data_loader, epoch, phase, seed, signal_c
         desc = log_epoch(seed, epoch, phase, loss_dict, eval_dict)
         pbar.set_description(desc) if use_tqdm else None
         # compute the avg_loss for the epoch desc
-        exec('for k, v in loss_dict.items():\n\tavg_loss_dict[k]=(avg_loss_dict.get(k, 0) * idx + v) / (idx + 1)')
+        for k, v in loss_dict.items():
+            avg_loss_dict[k]=(avg_loss_dict.get(k, 0) * idx + v) / (idx + 1)
 
     epoch_dict = {eval_metric.name: eval_metric.eval_epoch() for eval_metric in metric_list} if metric_list else {}
     epoch_dict.update({'clf_acc': clf_ACC.compute().item(), 'clf_auc': clf_AUC.compute().item()})
@@ -179,17 +181,15 @@ def train(config, method_name, model_name, backbone_seed, seed, dataset_name, pa
     criterion = F.binary_cross_entropy_with_logits
     map_location = torch.device('cpu') if not torch.cuda.is_available() else device
     init_metric_list = [AUCEvaluation()] if dataset_name != 'plbind' else [PrecEvaluation(20)]
+
     # establish the model and the metrics
     if method_name in inherent_models:
         baseline = constructor(clf, extractor, criterion, config[method_name])
         for epoch in range(1, warmup+1):
             run_one_epoch(baseline, optimizer, loaders['train'], epoch, 'warm', seed, signal_class, writer, data_augmentation=data_augmentation)
-            if True: # for debugging. Regular possible seed iterator 
-                run_one_epoch(baseline, None, loaders['valid'], epoch, 'warm', seed, signal_class, writer, data_augmentation=data_augmentation)
-                run_one_epoch(baseline, None, loaders['test'], epoch, 'warm', seed, signal_class, writer, data_augmentation=data_augmentation)
-            else:
-                list(loaders['valid'])
-                list(loaders['test'])
+            run_one_epoch(baseline, None, loaders['valid'], epoch, 'warm', seed, signal_class, writer, data_augmentation=data_augmentation)
+            run_one_epoch(baseline, None, loaders['test'], epoch, 'warm', seed, signal_class, writer, data_augmentation=data_augmentation)
+
         metric_list = init_metric_list
     elif method_name in post_hoc_attribution + post_hoc_explainers:
         baseline = constructor(clf, criterion, config[method_name]) if method_name != 'pgexplainer' else PGExplainer(clf, extractor, criterion, config['pgexplainer'])
@@ -298,16 +298,6 @@ def train(config, method_name, model_name, backbone_seed, seed, dataset_name, pa
             #* valid one epoch
             valid_dict = run_one_epoch(baseline, None, loaders['valid'], epoch, 'valid', seed, signal_class, writer, metric_list)
             test_dict, epoch_attn = run_one_epoch(baseline, None, loaders['test'], epoch, 'test', seed, signal_class, writer, metric_list, return_attn=True)
-            #* add the early stop process for dataset PLBind
-            if valid_dict[main_metric] > metric_dict[f'valid_{main_metric}']:
-                early_stop_count = 0
-                # test_dict, epoch_attn = run_one_epoch(baseline, None, loaders['test'], epoch, 'test', seed, signal_class, writer, metric_list, return_attn=True)
-            else:
-                early_stop_count += 1
-                # print('No better validation > Do not test.')
-                if early_stop_count == 50 and dataset_name == 'plbind' and model_name == 'pointtrans':
-                    print("50 Epochs without better validation -> Early Stop!\n", "=" * 80)
-                    break
         else:
             test_dict, epoch_attn = run_one_epoch(baseline, None, loaders['test'], epoch, 'test', seed, signal_class,  writer, metric_list, return_attn=True)
             valid_dict = test_dict # other methods don't need validation to select epochs

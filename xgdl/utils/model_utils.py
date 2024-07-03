@@ -107,34 +107,23 @@ class FeatEncoder(torch.nn.Module):
         x_embedding = self.dim_mapping(torch.cat(x_embedding, dim=-1))
         return x_embedding
 
+# def load_optimizer()
 
-def get_optimizer(clf, extractor, optimizer_config, method_name, warmup, weak_training=False):
+def get_optimizer(clf, extractor, optimizer_config, method_name, warmup):
     # pred_lr = method_config['pred_lr']
     # pred_wd = method_config['pred_wd']
 
-    wp_lr = optimizer_config['wp_lr']
-    wp_wd = optimizer_config['wp_wd']
-    attn_lr = optimizer_config['attn_lr']
-    attn_wd = optimizer_config['attn_wd']
-    emb_lr = optimizer_config['emb_lr']
-    emb_wd = optimizer_config['emb_wd']
+    wp_lr = optimizer_config['clf_lr']
+    wp_wd = optimizer_config['clf_wd']
+    attn_lr = optimizer_config['exp_lr']
+    attn_wd = optimizer_config['exp_wd']
+    emb_lr = optimizer_config['clf_lr']
+    emb_wd = optimizer_config['clf_wd']
 
     algo = torch.optim.Adam
     # clf_emb_model_params = [kv[1]  for kv in clf.named_parameters() if 'emb_model' in kv[0]]
     clf_base_params = [kv[1] for kv in clf.named_parameters() if 'emb_model' not in kv[0]]
     clf_emb_model_params = [kv[1]  for kv in clf.named_parameters() if 'emb_model' in kv[0]]
-
-
-    #! for the clf_auc-exp_auc figure of inherent methods
-    if weak_training is True:
-        attn_lr, emb_lr, wp_lr = (1.0e-5, ) * 3
-        attn_wd, emb_wd, wp_wd = (1.0e-7, ) * 3
-    elif weak_training == 'middle':
-        attn_lr, emb_lr, wp_lr = (3.0e-4, ) * 3
-        attn_wd, emb_wd, wp_wd = (3.0e-6, ) * 3
-    elif weak_training == 'minor':
-        attn_lr, emb_lr, wp_lr = (3.0e-6, ) * 3
-        attn_wd, emb_wd, wp_wd = (3.0e-8, ) * 3
 
     if warmup:
         return algo([{'params': clf_base_params}], lr=wp_lr, weight_decay=wp_wd)

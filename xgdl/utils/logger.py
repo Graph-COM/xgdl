@@ -16,12 +16,15 @@ def to_item(tensor):
         return tensor
 
 
-def log_epoch(seed, epoch, phase, loss_dict, log_dict, writer=None, phase_info='phase'):
-    comb_dict = dict(loss_dict, **log_dict)
+def log_epoch(epoch, phase, loss_dict, log_dict=None, seed=None, writer=None, phase_info='phase'):
+    comb_dict = dict(loss_dict, **log_dict) if log_dict is not None else loss_dict
     # print(comb_dict) if log_dict else None
     des_phase = phase + ' ' if phase in ['test', 'warm'] else phase  # align tqdm desc bar
     if phase_info == 'phase':
-        init_desc = f'[Seed {seed}, {des_phase.capitalize()} Epoch {epoch}] '
+        if seed:
+            init_desc = f'[Seed {seed}, {des_phase.capitalize()} Epoch {epoch}] '
+        else:
+            init_desc = f'[{des_phase.capitalize()} Epoch {epoch}] '
     else:
         assert phase_info == 'dataset'  # this api is used in test_sensitivity.py
         init_desc = f'[Seed {seed}, {des_phase.capitalize()} Dataset] '

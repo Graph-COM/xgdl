@@ -5,11 +5,13 @@ from torch_geometric.nn import knn_graph, radius_graph
 from torch_geometric.nn import global_mean_pool, global_add_pool, global_max_pool
 from .baselines import *
 from .backbones import DGCNN, PointTransformer, EGNN
-from .utils import ExtractorMLP, MLP, CoorsNorm
+from .utils import ExtractorMLP, MLP, CoorsNorm, get_optimizer, log_epoch
 from pathlib import Path
 import yaml
 from .utils import inherent_models, post_hoc_explainers, post_hoc_attribution
 from .get_data import get_loaders, ScienceDataset
+from .trainer import run_one_epoch, train_one_batch, select_augmentation
+from tqdm import tqdm
 
 POST_ATTRIBUTOR_MAPPING = {
     'gradcam': GradCAM,
@@ -37,12 +39,17 @@ class _XBaseModel:
     # Base class for auto models.
     _model_mapping = None
 
-    def __init__(self, *args, **kwargs):
-        raise EnvironmentError(
-            f"{self.__class__.__name__} is designed to be instantiated "
-            f"using the `{self.__class__.__name__}.from_name(method_name)` or "
-            f"`{self.__class__.__name__}.from_config(config)` methods."
-        )
+    def __init__(self, config, **kwargs):
+        self.baseline = self.from_config(config)
+        self.config = config
+        # raise EnvironmentError(
+        #     f"{self.__class__.__name__} is designed to be instantiated "
+        #     f"using the `{self.__class__.__name__}.from_name(method_name)` or "
+        #     f"`{self.__class__.__name__}.from_config(config)` methods."
+        # )
+
+    def __repr__(self):
+        return f'{self.baseline}'
 
     @classmethod
     def _prepare_clf_extractor(cls, dataset, config):
@@ -70,44 +77,167 @@ class _XBaseModel:
 
         name = config['method']
         method_config = config['hyperparameter']
+        method_config['signal_class'] = dataset_info.signal_class
 
         model_class = cls._model_mapping[name]
-        model = model_class(clf, extractor, criterion, method_config)
+        if 'grad' in name or name == 'gnnlrp':
+            model = model_class(clf, criterion, method_config)
+        else:
+            model = model_class(clf, extractor, criterion, method_config)
         return model
+    
+    def warmup(self, dataset):
+        trn_cfg = self.config['training']
+        dataloader = get_loaders(trn_cfg['batch_size'], dataset)
+        data_aug = select_augmentation(dataset.dataset_name)
+        train_loader = dataloader['train']
+        valid_loader = dataloader['valid']
 
-    def predict(sample):
-        pass
+        optimizer = get_optimizer(self.baseline.clf, self.baseline.extractor, trn_cfg, self.config['method'], warmup=True)
+        loader_len = len(train_loader)
+        pbar = tqdm(train_loader)
+        phase = 'warm'
+        for epoch in range(trn_cfg['warmup']):
+            for idx, data in enumerate(pbar):
+                data = data_aug(data, "train", train_loader, idx, loader_len=loader_len)
+                loss_dict, clf_logits, attn = train_one_batch(self.baseline, optimizer, data, epoch, phase)
+                desc = log_epoch(epoch, phase, loss_dict)
+                pbar.set_description(desc) 
+
+
+    def explain(self, data):
+        self.baseline.clf.eval()
+        self.baseline.extractor.eval() if hasattr(self.baseline, 'extractor') else None
+
+        self.baseline.start_tracking() if 'grad' in self.config['method'] or self.config['method'] == 'gnnlrp' else None
+
+        do_sampling = True if self.config['method'] == 'pgexplainer' else False # we find this is better for BernMaskP
+        loss, loss_dict, infer_clf_logits, node_attn = self.baseline.forward_pass(data, epoch=0, do_sampling=do_sampling)
+        data.node_imp = node_attn
+        return data
+
+    def predict(self, sample):
+        return self.baseline(sample)
 
 class PosthocAttributor(_XBaseModel):
     _model_mapping = POST_ATTRIBUTOR_MAPPING
-    def explain(sample):
-        pass
+    def train(self, dataset):
+        trn_cfg = self.config['training']
+        dataloader = get_loaders(trn_cfg['batch_size'], dataset)
+        data_aug = select_augmentation(dataset.dataset_name)
+        train_loader = dataloader['train']
+        valid_loader = dataloader['valid']
+        loader_len = len(train_loader)
+
+        print('Begin to train base model for prediction.')
+
+        pbar = tqdm(train_loader)
+        optimizer = get_optimizer(self.baseline.clf, None, trn_cfg, self.config['method'], warmup=True)
+        phase = 'warm'
+        for epoch in range(trn_cfg['epoch']):
+            for idx, data in enumerate(pbar):
+                data = data_aug(data, "train", train_loader, idx, loader_len=loader_len)
+                loss_dict, clf_logits, attn = train_one_batch(self.baseline, optimizer, data, epoch, phase)
+                desc = log_epoch(epoch, phase, loss_dict)
+                pbar.set_description(desc) 
+
+        print(f"Method {self.config['method']} do not need to train additional module. Training is completed.")
+
 
 class PosthocParametrizedModel(_XBaseModel):
     _model_mapping = POSTHOC_PARAMETRIZED_MODEL_MAPPING
-    def train(dataset, **kwargs):
-        pass
-    def explain(sample):
-        pass
+    def train(self, dataset):
+        trn_cfg = self.config['training']
+        dataloader = get_loaders(trn_cfg['batch_size'], dataset)
+        data_aug = select_augmentation(dataset.dataset_name)
+        train_loader = dataloader['train']
+        valid_loader = dataloader['valid']
+        loader_len = len(train_loader)
+
+        print('Begin to train base model for prediction.')
+
+        pbar = tqdm(train_loader)
+        optimizer = get_optimizer(self.baseline.clf, None, trn_cfg, self.config['method'], warmup=True)
+        phase = 'warm'
+        for epoch in range(trn_cfg['epoch']):
+            for idx, data in enumerate(pbar):
+                data = data_aug(data, "train", train_loader, idx, loader_len=loader_len)
+                loss_dict, clf_logits, attn = train_one_batch(self.baseline, optimizer, data, epoch, phase)
+                desc = log_epoch(epoch, phase, loss_dict)
+                pbar.set_description(desc) 
+
+        print("Continue to train additional module for explanation.")
+        
+        pbar = tqdm(train_loader)
+        optimizer = get_optimizer(self.baseline.clf, self.baseline.extractor, trn_cfg, self.config['method'], warmup=False)
+        phase = 'train' 
+        for epoch in range(trn_cfg['epoch']):
+            for idx, data in enumerate(pbar):
+                data = data_aug(data, "train", train_loader, idx, loader_len=loader_len)
+                loss_dict, clf_logits, attn = train_one_batch(self.baseline, optimizer, data, epoch, phase)
+                desc = log_epoch(epoch, phase, loss_dict)
+                pbar.set_description(desc) 
+
 
 class PosthocMethod(_XBaseModel):
     # _model_mapping = POSTHOC_PARAMETRIZED_MODEL_MAPPING | POST_ATTRIBUTOR_MAPPING
     _model_mapping = {**POSTHOC_PARAMETRIZED_MODEL_MAPPING, **POST_ATTRIBUTOR_MAPPING}  
-    def train(dataset):
-        pass
-    def explain(sample):
-        pass
+    def train(self, dataset):
+        trn_cfg = self.config['training']
+        dataloader = get_loaders(trn_cfg['batch_size'], dataset)
+        data_aug = select_augmentation(dataset.dataset_name)
+        train_loader = dataloader['train']
+        valid_loader = dataloader['valid']
+        loader_len = len(train_loader)
+
+        print('Begin to train base model for prediction.')
+
+        pbar = tqdm(train_loader)
+        optimizer = get_optimizer(self.baseline.clf, None, trn_cfg, self.config['method'], warmup=True)
+        phase = 'warm'
+        for epoch in range(trn_cfg['epoch']):
+            for idx, data in enumerate(pbar):
+                data = data_aug(data, "train", train_loader, idx, loader_len=loader_len)
+                loss_dict, clf_logits, attn = train_one_batch(self.baseline, optimizer, data, epoch, phase)
+                desc = log_epoch(epoch, phase, loss_dict)
+                pbar.set_description(desc) 
+
+
+        if self.config['method'] in POST_ATTRIBUTOR_MAPPING.keys():
+            print(f"Method {self.config['method']} do not need to train additional module. Training is completed.")
+            return
+        else:
+            print("Continue to train additional module for explanation.")
+
+        pbar = tqdm(train_loader)
+        optimizer = get_optimizer(self.baseline.clf, self.baseline.extractor, trn_cfg, self.config['method'], warmup=False)
+        phase = 'train' 
+        for epoch in range(trn_cfg['epoch']):
+            for idx, data in enumerate(pbar):
+                data = data_aug(data, "train", train_loader, idx, loader_len=loader_len)
+                loss_dict, clf_logits, attn = train_one_batch(self.baseline, optimizer, data, epoch, phase)
+                desc = log_epoch(epoch, phase, loss_dict)
+                pbar.set_description(desc) 
+
 
 class InherentModel(_XBaseModel):
     _model_mapping = INHERENT_MODEL_MAPPING
-    def train(dataset, **kwargs):
-        dataloader = get_loaders(dataset, **kwargs)
+    def train(self, dataset):
+        trn_cfg = self.config['training']
+        dataloader = get_loaders(trn_cfg['batch_size'], dataset)
+        data_aug = select_augmentation(dataset.dataset_name)
         train_loader = dataloader['train']
         valid_loader = dataloader['valid']
-        # for 
-
-    def explain(sample):
-        pass
+        optimizer = get_optimizer(self.baseline.clf, self.baseline.extractor, trn_cfg, self.config['method'], warmup=False)
+        loader_len = len(train_loader)
+        pbar = tqdm(train_loader)
+        phase = 'train'
+        for epoch in range(trn_cfg['epoch']):
+            for idx, data in enumerate(pbar):
+                data = data_aug(data, "train", train_loader, idx, loader_len=loader_len)
+                loss_dict, clf_logits, attn = train_one_batch(self.baseline, optimizer, data, epoch, phase)
+                desc = log_epoch(epoch, phase, loss_dict)
+                pbar.set_description(desc) 
 
 
 class Model(nn.Module):
