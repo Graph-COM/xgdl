@@ -1,4 +1,4 @@
 **/__pycache__
 **/*.pyc
-*.egg-info
+xgdl.egg-info
 dist
