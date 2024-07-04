@@ -1,4 +1,7 @@
 **/__pycache__
 **/*.pyc
 xgdl.egg-info
+.vscode
+.vscode/
+xgdl.egg-info/
 dist
