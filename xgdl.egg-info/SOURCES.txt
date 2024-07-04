@@ -1,9 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-setup.py
-xgdl.egg-info/PKG-INFO
-xgdl.egg-info/SOURCES.txt
-xgdl.egg-info/dependency_links.txt
-xgdl.egg-info/requires.txt
-xgdl.egg-info/top_level.txt
