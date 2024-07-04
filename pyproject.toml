@@ -1,0 +1,44 @@
+[project]
+name = "xgdl"
+version = "0.0.1"
+authors = [
+  { name = "Jiajun Zhu", email = "zhuconv@gmail.com" },
+  { name = "Siqi Miao", email = "siqim311@gamil.com" },
+]
+dependencies = [
+    "Bio",
+    "joblib",
+    "numpy",
+    "pandas",
+    "Pint",
+    "PyYAML",
+    "rdkit",
+    "rdkit_pypi",
+    "scikit_learn",
+    "scipy",
+    "tqdm",
+    "tensorboard",
+    "jupyter",
+    "pgmpy",
+    "torchmetrics",
+    "torch==1.12.1",
+    "torch_geometric==2.0.4",
+    "torch_scatter==2.0.9",
+    "torch_sparse==0.6.14",
+]
+description = "Explainability Library with Geometric Deep Learning for Scientific Tasks"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+"Homepage" = "https://github.com/Graph-COM/xgdl"
+"Bug Tracker" = "https://github.com/Graph-COM/xgdl/issues"

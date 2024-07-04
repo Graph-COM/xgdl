@@ -1,15 +1,153 @@
 Metadata-Version: 2.1
 Name: xgdl
-Version: 0.0.2
-Summary: My first Python package
+Version: 0.0.1
+Summary: Explainability Library with Geometric Deep Learning for Scientific Tasks
 Author: Jiajun Zhu
-Author-email: <zhuconv@gmail.com>
-Keywords: geometric deep learning,explainable AI,graph neural network,AI for science
-Classifier: Development Status :: 3 - Alpha
-Classifier: Intended Audience :: Education
-Classifier: Programming Language :: Python :: 2
+Author-email: Jiajun Zhu <zhuconv@gmail.com>, Siqi Miao <siqim311@gamil.com>
+Project-URL: Homepage, https://github.com/Graph-COM/xgdl
+Project-URL: Bug Tracker, https://github.com/Graph-COM/xgdl/issues
 Classifier: Programming Language :: Python :: 3
-Classifier: Operating System :: MacOS :: MacOS X
-Classifier: Operating System :: Microsoft :: Windows
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: Bio
+Requires-Dist: joblib
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: Pint
+Requires-Dist: PyYAML
+Requires-Dist: rdkit
+Requires-Dist: rdkit_pypi
+Requires-Dist: scikit_learn
+Requires-Dist: scipy
+Requires-Dist: tqdm
+Requires-Dist: tensorboard
+Requires-Dist: jupyter
+Requires-Dist: pgmpy
+Requires-Dist: torchmetrics
+Requires-Dist: torch==1.12.1
+Requires-Dist: torch_geometric==2.0.4
+Requires-Dist: torch_scatter==2.0.9
+Requires-Dist: torch_sparse==0.6.14
 
-My first Python package with a slightly longer description
+# XGDL 
+XGDL (eXplainability for Geometric Deep Learning) is an explainability library for scientific tasks using geometric deep learning. (The interface is in a state of ongoing enhancement.)
+______________________________________________________________________
+## Features
+- The implementation of 13 methods including self-interpretable (inherent) and post-hoc methods
+- The evaluation pipeline for both sensitive and deicisve patterns (see our paper for more details)
+- The dataloader module for scientific datasets.
+
+## Quick Tour
+
+### Load Dataset
+```python
+from xgdl import ScienceDataset    
+
+dataset = ScienceDataset.from_name('synmol')
+key_subset = ScienceDataset.filter_signal_class(dataset)
+sample = key_subset[0]
+```
+
+> Output: Data(x=[18, 1], y=[1, 1], pos=[18, 3], node_label=[18], mol_df_idx=[1], edge_index=[2, 90])
+
+### Use Self-interpretatble Model
+```python
+from xgdl import InherentModel
+
+inherent_config = {
+        'method': "lri_bern",
+        'model': "egnn", # choose from ['egnn', 'dgcnn', 'pointtrans']
+        "dataset": "synmol", # choose from ['synmol', 'tau3mu', 'actstrack', 'plbind']
+        "hyperparameter":
+            {
+            'pred_loss_coef': 0.1,
+            'info_loss_coef': 0.05,
+            'temperature': 1.0,
+            'final_r': 0.9,
+            'decay_interval': 10,
+            'decay_r': 0.01,
+            'init_r': 0.5,
+            'attn_constraint': True
+            },
+        "training":
+            {
+            'clf_lr': 1.0e-3,
+            'clf_wd': 1.0e-5,
+            'exp_lr': 1.0e-3,
+            'exp_wd': 1.0e-5,
+            'batch_size': 4,
+            'epoch': 1,
+            }
+        }
+
+inherent_explainer = InherentModel(inherent_config)
+
+# for inherent method, use train and then explain
+inherent_explainer.train(dataset)
+interpretation = inherent_explainer.explain(sample)
+
+```
+### Use Post-hoc Method
+```python
+from xgdl import PosthocMethod
+
+posthoc_config = {
+    'method': "gradcam",
+    'model': "egnn", # choose from ['egnn', 'dgcnn', 'pointtrans']
+    "dataset": "synmol", # choose from ['synmol', 'tau3mu', 'actstrack', 'plbind']
+    # "train_from_scratch": True,
+    "hyperparameter":
+    {
+        'pred_loss_coef': 0.1,
+        'info_loss_coef': 0.05,
+        'temperature': 1.0,
+        'final_r': 0.9,
+        'decay_interval': 10,
+        'decay_r': 0.01,
+        'init_r': 0.5,
+        'attn_constraint': True
+    },
+    "training":
+        {
+        'clf_lr': 1.0e-3,
+        'clf_wd': 1.0e-5,
+        'exp_lr': 1.0e-3,
+        'exp_wd': 1.0e-5,
+        'batch_size': 4,
+        'epoch': 1,
+        'warmup': 1,
+        }
+}
+
+posthoc_explainer = PosthocMethod(posthoc_config)
+
+# for post_hoc method of class PostAttributor, omit train and directly explain
+posthoc_explainer.train(dataset)
+interpretation = posthoc_explainer.explain(sample)
+```
+
+### Evaluate Model Interpretation
+
+```python
+print(interpretation)
+```
+> Output: Data(x=[20, 1], y=[1, 1], pos=[20, 3], node_label=[20], mol_df_idx=[1], edge_index=[2, 100], node_imp=[20])
+
+```python
+from xgdl import XEvaluator 
+
+sensitive_eval = XEvaluator("sensitive", pretrained_model_init=pretrained_model_init)
+fidel = sensitive_eval(interpretation)
+
+decisive_eval = XEvaluator('decisive')
+auc = decisive_eval(interpretation)
+
+```
+
+## Installation
+```
+pip install xgdl
+```
