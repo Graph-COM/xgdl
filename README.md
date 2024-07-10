@@ -1,4 +1,3 @@
-# XGDL 
 <h1 align="center">XGDL (eXplainability for Geometric Deep Learning)</h1>
 <p align="center">
     <a href="https://arxiv.org/abs/2407.00849"><img src="https://img.shields.io/badge/-arXiv-grey?logo=gitbook&logoColor=white" alt="Paper"></a>
