@@ -1,16 +1,12 @@
 # XGDL 
-<h1 align="center">Learnable Randomness Injection (LRI)</h1>
+<h1 align="center">XGDL (eXplainability for Geometric Deep Learning)</h1>
 <p align="center">
-    <a href="https://arxiv.org/abs/2210.16966"><img src="https://img.shields.io/badge/-arXiv-grey?logo=gitbook&logoColor=white" alt="Paper"></a>
-    <a href="https://github.com/Graph-COM/LRI"><img src="https://img.shields.io/badge/-Github-grey?logo=github" alt="Github"></a>
-    <a href="https://openreview.net/forum?id=6u7mf9s2A9"> <img alt="License" src="https://img.shields.io/static/v1?label=Pub&message=ICLR%2723&color=blue"> </a>
-    <!-- <a href="https://github.com/Graph-COM/GSAT/blob/main/LICENSE"> <img alt="License" src="https://img.shields.io/github/license/Graph-Com/GSAT?color=blue"> </a>
-    <a href="https://icml.cc/virtual/2022/spotlight/17430"> <img src="https://img.shields.io/badge/Video-grey?logo=Kuaishou&logoColor=white" alt="Video"></a>
-    <a href="https://icml.cc/media/icml-2022/Slides/17430.pdf"> <img src="https://img.shields.io/badge/Slides-grey?&logo=MicrosoftPowerPoint&logoColor=white" alt="Slides"></a>
-    <a href="https://icml.cc/media/PosterPDFs/ICML%202022/a8acc28734d4fe90ea24353d901ae678.png"> <img src="https://img.shields.io/badge/Poster-grey?logo=airplayvideo&logoColor=white" alt="Poster"></a> -->
+    <a href="https://arxiv.org/abs/2407.00849"><img src="https://img.shields.io/badge/-arXiv-grey?logo=gitbook&logoColor=white" alt="Paper"></a>
+    <a href="https://github.com/Graph-COM/xgdl"><img src="https://img.shields.io/badge/-Github-grey?logo=github" alt="Github"></a>
+    <a> <img alt="License" src="https://img.shields.io/badge/Under%20Review-blue"> </a>
 </p>
 
-XGDL (eXplainability for Geometric Deep Learning) is an explainability library for scientific tasks using geometric deep learning. (The interface is in a state of ongoing enhancement.)
+XGDL is an explainability library for scientific tasks using geometric deep learning. (The interface is in a state of ongoing enhancement.)
 ______________________________________________________________________
 ## Features
 - The implementation of 13 methods including self-interpretable (inherent) and post-hoc methods
