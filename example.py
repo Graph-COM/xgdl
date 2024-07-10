@@ -82,17 +82,17 @@ def main():
     interpretation = posthoc_explainer.explain(sample)
     print(interpretation)
 
-### Evaluate Model Interpretation
+    ## Evaluate Model Interpretation
 
-# from xgdl import XEvaluator 
+    from xgdl import XEvaluator 
 
-# intepretation = ...
+    intepretation = ...
 
-# sensitive_eval = XEvaluator("sensitive", pretrained_model_init=pretrained_model_init)
-# fidel = sensitive_eval(interpretation)
+    sensitive_eval = XEvaluator("sensitive")
+    fidel = sensitive_eval(interpretation)
 
-# decisive_eval = XEvaluator('decisive')
-# auc = decisive_eval(interpretation)
+    decisive_eval = XEvaluator('decisive')
+    auc = decisive_eval(interpretation)
 
 if __name__ == '__main__':
     main()
