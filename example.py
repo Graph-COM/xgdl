@@ -88,7 +88,6 @@ def main():
 
     # intepretation = ...
 
-    # fidel = Fidelity.compute(interpretation)
     fidel = fidelity(interpretation, explainer=posthoc_explainer)
     auc = x_rocauc(interpretation)
 

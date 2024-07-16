@@ -109,13 +109,10 @@ print(interpretation)
 > Output: Data(x=[20, 1], y=[1, 1], pos=[20, 3], node_label=[20], mol_df_idx=[1], edge_index=[2, 100], node_imp=[20])
 
 ```python
-from xgdl import XEvaluator 
+from xgdl import x_rocauc, fidelity
 
-sensitive_eval = XEvaluator("sensitive", pretrained_model_init=pretrained_model_init)
-fidel = sensitive_eval(interpretation)
-
-decisive_eval = XEvaluator('decisive')
-auc = decisive_eval(interpretation)
+fidel = fidelity(interpretation, explainer=posthoc_explainer)
+auc = x_rocauc(interpretation)
 
 ```
 
