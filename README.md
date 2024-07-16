@@ -124,7 +124,7 @@ This package is supported for *macOS* and *Linux*. The package has been tested o
 + macOS: Sonoma (14.2.1)
 + Linux: Ubuntu 20.04
 
-## Python Dependencies
+### Python Dependencies
 ``xgdl`` mainly depends on the following packages, which should take approximately 5 minutes to install using pip on a recommended computer.
 ```
 Bio,
