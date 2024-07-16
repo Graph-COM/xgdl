@@ -5,7 +5,7 @@
     <a> <img alt="License" src="https://img.shields.io/badge/Under%20Review-blue"> </a>
 </p>
 
-XGDL is an explainability library for scientific tasks using geometric deep learning. (The interface is in a state of ongoing enhancement.)
+``xgdl`` is an explainability library for scientific tasks using geometric deep learning. (The interface is in a state of ongoing enhancement.)
 ______________________________________________________________________
 ## Features
 - The implementation of 13 methods including self-interpretable (inherent) and post-hoc methods
@@ -15,6 +15,8 @@ ______________________________________________________________________
 ## Quick Tour
 
 ### Load Dataset
+All our datasets can be downloaded and processed automatically. By default, the code will ask if the raw files and/or the processed files should be downloaded. Also, you can download datasets from Zenodo manually: https://doi.org/10.5281/zenodo.7265547.
+
 ```python
 from xgdl import ScienceDataset    
 
@@ -115,6 +117,37 @@ fidel = fidelity(interpretation, explainer=posthoc_explainer)
 auc = x_rocauc(interpretation)
 
 ```
+
+## System Requirements
+### OS Requirements
+This package is supported for *macOS* and *Linux*. The package has been tested on the following systems:
++ macOS: Sonoma (14.2.1)
++ Linux: Ubuntu 20.04
+
+## Python Dependencies
+``xgdl`` mainly depends on the following packages, which should take approximately 5 minutes to install using pip on a recommended computer.
+```
+Bio,
+joblib,
+numpy,
+pandas,
+Pint,
+PyYAML,
+rdkit,
+rdkit_pypi,
+scikit_learn,
+scipy,
+tqdm,
+tensorboard,
+jupyter,
+pgmpy,
+torchmetrics,
+torch,
+torch_geometric,
+torch_scatter,
+torch_sparse,
+```
+
 
 ## Installation
 ```

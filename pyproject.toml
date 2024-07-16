@@ -1,6 +1,6 @@
 [project]
 name = "xgdl"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name = "Jiajun Zhu", email = "zhuconv@gmail.com" },
   { name = "Siqi Miao", email = "siqim311@gamil.com" },
