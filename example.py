@@ -78,21 +78,19 @@ def main():
     # posthoc_explainer.explain(sample)
 
     # for some post_hoc method, use train and then explain
-    posthoc_explainer.train(dataset)
+    # posthoc_explainer.train(dataset)
     interpretation = posthoc_explainer.explain(sample)
     print(interpretation)
 
     ## Evaluate Model Interpretation
 
-    from xgdl import XEvaluator 
+    from xgdl import x_rocauc, fidelity
 
-    intepretation = ...
+    # intepretation = ...
 
-    sensitive_eval = XEvaluator("sensitive")
-    fidel = sensitive_eval(interpretation)
-
-    decisive_eval = XEvaluator('decisive')
-    auc = decisive_eval(interpretation)
+    # fidel = Fidelity.compute(interpretation)
+    fidel = fidelity(interpretation, explainer=posthoc_explainer)
+    auc = x_rocauc(interpretation)
 
 if __name__ == '__main__':
     main()

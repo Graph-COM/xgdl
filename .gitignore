@@ -3,3 +3,4 @@
 .vscode/
 xgdl.egg-info/
 dist/
+example.py
