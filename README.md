@@ -12,7 +12,7 @@ ______________________________________________________________________
 - The evaluation pipeline for both sensitive and deicisve patterns (see our paper for more details)
 - The dataloader module for scientific datasets.
 
-## Quick Tour
+## Demo
 
 ### Load Dataset
 All our datasets can be downloaded and processed automatically. By default, the code will ask if the raw files and/or the processed files should be downloaded. Also, you can download datasets from Zenodo manually: https://doi.org/10.5281/zenodo.7265547.
