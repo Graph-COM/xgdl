@@ -45,4 +45,4 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"xgdl" = ["*.yml"]
+"xgdl" = ["configs/*.yml"]
