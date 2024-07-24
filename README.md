@@ -150,11 +150,30 @@ torch_sparse,
 
 
 ## Installation
+``xgdl`` depends on the ``torch``, make sure you have torch in your python environment and continue. If not, we suggest follow the instructions of [pytorch](https://pytorch.org/get-started/previous-versions/) to install a suitable version. 
+
+```
+
+```
+
+Another dependency ``torch_geometric`` need to be manually installed from outer resources.
+```
+pip install torch-scatter torch-sparse torch-cluster torch-geometric -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
+```
+where ${TORCH_VERSION} should be replaced by your torch version and ${CUDA} should be replaced by either cpu, cu118, or cu121 depending on your PyTorch installation.
+Then install xgdl
 ```
 pip install xgdl
 ```
+**or** build from source
+```
+git clone git@github.com:Graph-COM/xgdl.git
+cd xgdl
+python install ./
+```
 
-## Reference
+
+## Citations
 
 If you find our paper and repo useful, please cite our relevant paper:
 ```bibtex
