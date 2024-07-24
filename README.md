@@ -125,7 +125,7 @@ This package is supported for *macOS* and *Linux*. The package has been tested o
 + Linux: Ubuntu 20.04
 
 ### Python Dependencies
-``xgdl`` mainly depends on the following packages, which should take approximately 5 minutes to install using pip on a recommended computer.
+``xgdl`` mainly depends on the following packages
 ```
 Bio
 joblib
@@ -148,34 +148,35 @@ torchmetrics
 ``xgdl`` depends on the ``torch``, make sure you have torch in your python environment and continue. If not, we suggest follow [official instructions](https://pytorch.org/get-started/previous-versions/) to install a suitable version. 
 
 For example,
-```
+```sh
 conda install pytorch==2.3.0 cpuonly -c pytorch
 ```
-This may take 3-5 minutes.
+This process may take 3-5 minutes.
 
-Another dependency ``torch_geometric`` need to be manually installed from outer resources. We suggest follow [official instructions](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) (Optional dependencies ``torch_scatter`` and ``torch_sparse`` for ``torch_geometric`` are required)
-```
+Another dependency ``torch_geometric`` need to be manually installed from external sources. We suggest follow [official instructions](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) (Optional dependencies ``torch_scatter`` and ``torch_sparse`` for ``torch_geometric`` are required)
+```sh
 pip install torch_geometric
 pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
 ```
 where ${TORCH_VERSION} should be replaced by your torch version and ${CUDA} should be replaced by either cpu, cu118, or cu121 depending on your PyTorch installation. For example,
-```
+```sh
 pip install torch_geometric
 pip install torch-scatter torch-sparse torch-cluster torch-geometric -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
 ```
 This may take 1-3 minutes.
 
-Then install xgdl from pypi
-```
+To install xgdl from pypi
+
+```sh
 pip install xgdl -i https://pypi.org/simple
 ```
 **or** build from source
-```
+```sh
 git clone https://github.com/Graph-COM/xgdl.git
 cd xgdl
 python install ./
 ```
-This may take 4-6 minutes.
+This process may take 4-6 minutes.
 
 ## Citations
 
