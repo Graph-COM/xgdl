@@ -158,14 +158,14 @@ Another dependency ``torch_geometric`` need to be manually installed from extern
 pip install torch_geometric
 pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
 ```
-where ${TORCH_VERSION} should be replaced by your torch version and ${CUDA} should be replaced by either cpu, cu118, or cu121 depending on your PyTorch installation. For example,
+where ``${TORCH_VERSION}`` should be replaced by your torch version and ``${CUDA}`` should be replaced by either ``cpu``, ``cu118``, or ``cu121`` depending on your PyTorch installation. For example,
 ```sh
 pip install torch_geometric
 pip install torch-scatter torch-sparse torch-cluster torch-geometric -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
 ```
 This process may take 1-3 minutes.
 
-To install xgdl from pypi
+To install ``xgdl`` from pypi
 
 ```sh
 pip install xgdl -i https://pypi.org/simple
