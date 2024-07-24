@@ -39,7 +39,7 @@ build-backend = "setuptools.build_meta"
 "Bug Tracker" = "https://github.com/Graph-COM/xgdl/issues"
 
 [tool.setuptools]
-package-dir = {"": "src"}
+package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
