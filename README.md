@@ -167,7 +167,7 @@ This may take 1-3 minutes.
 
 Then install xgdl from pypi
 ```
-pip install xgdl
+pip install xgdl -i https://pypi.org/simple
 ```
 **or** build from source
 ```
