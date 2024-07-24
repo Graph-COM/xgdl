@@ -127,51 +127,55 @@ This package is supported for *macOS* and *Linux*. The package has been tested o
 ### Python Dependencies
 ``xgdl`` mainly depends on the following packages, which should take approximately 5 minutes to install using pip on a recommended computer.
 ```
-Bio,
-joblib,
-numpy,
-pandas,
-Pint,
-PyYAML,
-rdkit,
-rdkit_pypi,
-scikit_learn,
-scipy,
-tqdm,
-tensorboard,
-jupyter,
-pgmpy,
-torchmetrics,
-torch,
-torch_geometric,
-torch_scatter,
-torch_sparse,
+Bio
+joblib
+numpy
+pandas
+Pint
+PyYAML
+rdkit
+rdkit_pypi
+scikit_learn
+scipy
+tqdm
+tensorboard
+jupyter
+pgmpy
+torchmetrics
 ```
-
 
 ## Installation
-``xgdl`` depends on the ``torch``, make sure you have torch in your python environment and continue. If not, we suggest follow the instructions of [pytorch](https://pytorch.org/get-started/previous-versions/) to install a suitable version. 
+``xgdl`` depends on the ``torch``, make sure you have torch in your python environment and continue. If not, we suggest follow [official instructions](https://pytorch.org/get-started/previous-versions/) to install a suitable version. 
 
+For example,
 ```
+conda install pytorch==2.3.0 cpuonly -c pytorch
+```
+This may take 3-5 minutes.
 
+Another dependency ``torch_geometric`` need to be manually installed from outer resources. We suggest follow [official instructions](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) (Optional dependencies ``torch_scatter`` and ``torch_sparse`` for ``torch_geometric`` are required)
 ```
+pip install torch_geometric
+pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
+```
+where ${TORCH_VERSION} should be replaced by your torch version and ${CUDA} should be replaced by either cpu, cu118, or cu121 depending on your PyTorch installation. For example,
+```
+pip install torch_geometric
+pip install torch-scatter torch-sparse torch-cluster torch-geometric -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+```
+This may take 1-3 minutes.
 
-Another dependency ``torch_geometric`` need to be manually installed from outer resources.
-```
-pip install torch-scatter torch-sparse torch-cluster torch-geometric -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
-```
-where ${TORCH_VERSION} should be replaced by your torch version and ${CUDA} should be replaced by either cpu, cu118, or cu121 depending on your PyTorch installation.
-Then install xgdl
+Then install xgdl from pypi
 ```
 pip install xgdl
 ```
 **or** build from source
 ```
-git clone git@github.com:Graph-COM/xgdl.git
+git clone https://github.com/Graph-COM/xgdl.git
 cd xgdl
 python install ./
 ```
-
+This may take 4-6 minutes.
 
 ## Citations
 

@@ -8,7 +8,6 @@ authors = [
 dependencies = [
     "Bio",
     "joblib",
-    "numpy",
     "pandas",
     "Pint",
     "PyYAML",
@@ -38,3 +37,12 @@ build-backend = "setuptools.build_meta"
 [project.urls]
 "Homepage" = "https://github.com/Graph-COM/xgdl"
 "Bug Tracker" = "https://github.com/Graph-COM/xgdl/issues"
+
+[tool.setuptools]
+package-dir = {"": "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"xgdl" = ["*.yml"]
