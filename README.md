@@ -15,7 +15,7 @@ ______________________________________________________________________
 ## Demo
 
 ### Load Dataset
-All our datasets can be downloaded and processed automatically. By default, the code will ask if the raw files and/or the processed files should be downloaded. Also, you can download datasets from [Zenodo](https://doi.org/10.5281/zenodo.7265547) manually and place raw/processed file under ``./data/${DATASET_NAME}/raw`` or ``./data/${DATASET_NAME}/processed``.
+All our datasets can be downloaded and processed automatically. By default, the code will ask if the raw files and/or the processed files should be downloaded. Also, you can download datasets from [Zenodo](https://doi.org/10.5281/zenodo.7265547) manually and extract raw/processed file under the directory ``./data/${DATASET_NAME}``.
 
 ```python
 from xgdl import ScienceDataset    
@@ -163,7 +163,7 @@ where ${TORCH_VERSION} should be replaced by your torch version and ${CUDA} shou
 pip install torch_geometric
 pip install torch-scatter torch-sparse torch-cluster torch-geometric -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
 ```
-This may take 1-3 minutes.
+This process may take 1-3 minutes.
 
 To install xgdl from pypi
 
