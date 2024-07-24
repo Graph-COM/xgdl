@@ -15,7 +15,7 @@ ______________________________________________________________________
 ## Demo
 
 ### Load Dataset
-All our datasets can be downloaded and processed automatically. By default, the code will ask if the raw files and/or the processed files should be downloaded. Also, you can download datasets from Zenodo manually: https://doi.org/10.5281/zenodo.7265547.
+All our datasets can be downloaded and processed automatically. By default, the code will ask if the raw files and/or the processed files should be downloaded. Also, you can download datasets from [Zenodo](https://doi.org/10.5281/zenodo.7265547) manually and place raw/processed file under ``./data/${DATASET_NAME}/raw`` or ``./data/${DATASET_NAME}/processed``.
 
 ```python
 from xgdl import ScienceDataset    
