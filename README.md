@@ -146,17 +146,16 @@ torchmetrics
 ```
 
 ## Installation
-``xgdl`` depends on the ``torch``, make sure you have torch in your python environment and continue. If not, we suggest follow [official instructions](https://pytorch.org/get-started/previous-versions/) to install a suitable version. 
-
-For example,
+To use ``xgdl``, ensure that ``torch`` is installed in your Python environment. If not, please follow the [official instructions](https://pytorch.org/get-started/previous-versions/) to install an appropriate version.
+For example with conda environment,
 ```sh
 conda install pytorch==2.3.0 cpuonly -c pytorch
 ```
 This process may take 3-5 minutes.
 
-Another dependency ``torch_geometric`` need to be manually installed from external sources. Optional dependencies ``torch_scatter`` and ``torch_sparse`` for ``torch_geometric`` are required. Supported ``torch_geometric`` versions include ``>=2.0.0, <=2.2.0``.   
+Additionally, ``torch_geometric`` need to be manually installed from external sources. The optional dependencies ``torch_scatter`` and ``torch_sparse`` are required for ``torch_geometric``. Supported ``torch_geometric`` versions are ``>=2.0.0,<=2.2.0``.   
 ```sh
-pip install torch-scatter torch-sparse torch-cluster torch_geometric==2.0.4 -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
+pip install torch-scatter torch-sparse torch-cluster "torch_geometric>=2.0.0,<=2.2.0" -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
 ```
 where ``${TORCH_VERSION}`` should be replaced by your torch version and ``${CUDA}`` should be replaced by either ``cpu``, ``cu118``, or ``cu121``. For example,
 ```sh
