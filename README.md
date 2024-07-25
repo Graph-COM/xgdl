@@ -155,11 +155,13 @@ This process may take 3-5 minutes.
 
 Additionally, ``torch_geometric`` need to be manually installed from external sources. The optional dependencies ``torch_scatter`` and ``torch_sparse`` are required for ``torch_geometric``. Supported ``torch_geometric`` versions are ``>=2.0.0,<=2.2.0``.   
 ```sh
-pip install torch-scatter torch-sparse torch-cluster "torch_geometric>=2.0.0,<=2.2.0" -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
+pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
+pip install "torch_geometric>=2.0.0,<=2.2.0"
 ```
 where ``${TORCH_VERSION}`` should be replaced by your torch version and ``${CUDA}`` should be replaced by either ``cpu``, ``cu118``, or ``cu121``. For example,
 ```sh
-pip install torch-scatter torch-sparse torch-cluster torch-geometric==2.0.4 -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+pip install torch-geometric==2.0.4
 ```
 This process may take 1-3 minutes.
 
