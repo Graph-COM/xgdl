@@ -1,5 +1,6 @@
 <h1 align="center">XGDL (eXplainability for Geometric Deep Learning)</h1>
 <p align="center">
+    <a href="https://pypi.python.org/pypi/xgdl"><img src="https://badge.fury.io/py/xgdl.svg"></a>
     <a href="https://arxiv.org/abs/2407.00849"><img src="https://img.shields.io/badge/-arXiv-grey?logo=gitbook&logoColor=white" alt="Paper"></a>
     <a href="https://github.com/Graph-COM/xgdl"><img src="https://img.shields.io/badge/-Github-grey?logo=github" alt="Github"></a>
     <a> <img alt="License" src="https://img.shields.io/badge/Under%20Review-blue"> </a>
@@ -9,7 +10,7 @@
 ______________________________________________________________________
 ## Features
 - The implementation of 13 methods including self-interpretable (inherent) and post-hoc methods
-- The evaluation pipeline for both sensitive and deicisve patterns (see our paper for more details)
+- The evaluation pipeline for both sensitive and deicisve patterns (see our [paper](https://arxiv.org/abs/2407.00849) for more details)
 - The dataloader module for scientific datasets.
 
 ## Demo
@@ -155,13 +156,11 @@ This process may take 3-5 minutes.
 
 Another dependency ``torch_geometric`` need to be manually installed from external sources. We suggest follow [official instructions](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) (Optional dependencies ``torch_scatter`` and ``torch_sparse`` for ``torch_geometric`` are required)
 ```sh
-pip install torch_geometric
-pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
+pip install torch-scatter torch-sparse torch-cluster torch_geometric==2.0.4 -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
 ```
 where ``${TORCH_VERSION}`` should be replaced by your torch version and ``${CUDA}`` should be replaced by either ``cpu``, ``cu118``, or ``cu121``. For example,
 ```sh
-pip install torch_geometric
-pip install torch-scatter torch-sparse torch-cluster torch-geometric -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+pip install torch-scatter torch-sparse torch-cluster torch-geometric=2.0.4 -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
 ```
 This process may take 1-3 minutes.
 
