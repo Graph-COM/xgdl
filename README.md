@@ -128,6 +128,8 @@ This package is supported for *macOS* and *Linux*. The package has been tested o
 ### Python Dependencies
 ``xgdl`` mainly depends on the following packages
 ```
+torch
+torch_geometric
 Bio
 joblib
 numpy
@@ -153,7 +155,7 @@ conda install pytorch==2.3.0 cpuonly -c pytorch
 ```
 This process may take 3-5 minutes.
 
-Additionally, ``torch_geometric`` need to be manually installed from external sources. The optional dependencies ``torch_scatter`` and ``torch_sparse`` are required for ``torch_geometric``. Supported ``torch_geometric`` versions are ``>=2.0.0,<=2.2.0``.   
+Additionally, ``torch_geometric`` need to be manually installed from external sources. The optional dependencies ``torch_scatter`` and ``torch_sparse`` must be installed before ``torch_geometric``. Supported ``torch_geometric`` versions are ``>=2.0.0,<=2.2.0``.   
 ```sh
 pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
 pip install "torch_geometric>=2.0.0,<=2.2.0"
