@@ -154,13 +154,13 @@ conda install pytorch==2.3.0 cpuonly -c pytorch
 ```
 This process may take 3-5 minutes.
 
-Another dependency ``torch_geometric`` need to be manually installed from external sources. We suggest follow [official instructions](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) (Optional dependencies ``torch_scatter`` and ``torch_sparse`` for ``torch_geometric`` are required)
+Another dependency ``torch_geometric`` need to be manually installed from external sources. Optional dependencies ``torch_scatter`` and ``torch_sparse`` for ``torch_geometric`` are required. Supported ``torch_geometric`` versions include ``>=2.0.0, <=2.2.0``.   
 ```sh
 pip install torch-scatter torch-sparse torch-cluster torch_geometric==2.0.4 -f https://data.pyg.org/whl/torch-${TORCH_VERSION}+${CUDA}.html
 ```
 where ``${TORCH_VERSION}`` should be replaced by your torch version and ``${CUDA}`` should be replaced by either ``cpu``, ``cu118``, or ``cu121``. For example,
 ```sh
-pip install torch-scatter torch-sparse torch-cluster torch-geometric=2.0.4 -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
+pip install torch-scatter torch-sparse torch-cluster torch-geometric==2.0.4 -f https://data.pyg.org/whl/torch-2.3.0+cpu.html
 ```
 This process may take 1-3 minutes.
 
