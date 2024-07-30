@@ -176,7 +176,7 @@ pip install xgdl -i https://pypi.org/simple
 ```sh
 git clone https://github.com/Graph-COM/xgdl.git
 cd xgdl
-python install ./
+pip install ./
 ```
 This process may take 4-6 minutes.
 
